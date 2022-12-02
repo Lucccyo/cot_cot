@@ -830,7 +830,7 @@ Notation "x * y" := (mult x y)
                        (at level 40, left associativity)
                        : nat_scope.
 
-Check ((0 + 1) + 1) : nat.
+Check ((0 + 5) + 1) : nat.
 
 (** (The [level], [associativity], and [nat_scope] annotations
     control how these notations are treated by Coq's parser.  The
@@ -906,17 +906,21 @@ Proof. simpl. reflexivity.  Qed.
     function.  (It can be done with just one previously defined
     function, but you can use two if you want.) *)
 
-Definition ltb (n m : nat) : bool
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition ltb (n m : nat) : bool :=
+  if n <=? m then
+    if n =? m then
+      false
+    else true
+  else false.
 
 Notation "x <? y" := (ltb x y) (at level 70) : nat_scope.
 
 Example test_ltb1:             (ltb 2 2) = false.
-(* FILL IN HERE *) Admitted.
+Proof. simpl. reflexivity. Qed.
 Example test_ltb2:             (ltb 2 4) = true.
-(* FILL IN HERE *) Admitted.
+Proof. simpl. reflexivity. Qed.
 Example test_ltb3:             (ltb 4 2) = false.
-(* FILL IN HERE *) Admitted.
+Proof. simpl. reflexivity. Qed.
 (** [] *)
 
 (* ################################################################# *)
