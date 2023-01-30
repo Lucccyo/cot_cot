@@ -323,7 +323,7 @@ Definition orb' (b1:bool) (b2:bool) : bool :=
 
 Definition nandb (b1:bool) (b2:bool) : bool :=
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
-  if b1 then 
+  if b1 then
   match b2 with
   | true  => false
   | false => true
@@ -353,7 +353,6 @@ Definition andb3 (b1:bool) (b2:bool) (b3:bool) : bool:=
     then b3
     else false
   else false.
-  
 
 Example test_andb31:                 (andb3 true true true) = true.
 Proof. simpl. reflexivity. Qed.
@@ -1544,7 +1543,7 @@ Theorem andb_eq_orb :
 Proof.
   intros b c.
   destruct b.
-    - destruct c. 
+    - destruct c.
       + reflexivity.
       + simpl. intros H. rewrite <- H. reflexivity.
     - destruct c.
@@ -1594,8 +1593,8 @@ Fixpoint incr (m:bin) : bin :=
   match m with
   | Z  => B1 Z
   | B0 m' => B1 m'
-  | B1 (m n) => B0 m
-  end. 
+  | B1 m' => B0 (incr m')
+  end.
  (* Admitted. *)
 
 Compute (incr (B1(Z))).
@@ -1606,8 +1605,8 @@ Compute incr (incr (incr (incr (B1(Z))))).
 Fixpoint bin_to_nat (m:bin) : nat :=
   match m with
   | Z => 0
-  | B0 m' => S (bin_to_nat m')
-  | B1 m' => S (bin_to_nat m')
+  | B0 m' => (bin_to_nat m') + (bin_to_nat m')
+  | B1 m' => S (bin_to_nat m') + (bin_to_nat m')
   end.
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." Admitted. *)
 
@@ -1623,14 +1622,17 @@ Proof.
 Qed.
 
 Example test_bin_incr2 : (incr (B0 (B1 Z))) = B1 (B1 Z).
-Proof.
-  simpl. reflexivity.
-Qed.
+Proof. simpl. reflexivity. Qed.
 
-(* Example test_bin_incr3 : (incr (B1 (B1 Z))) = B0 (B0 (B1 Z)).
-Proof.
-  simpl. reflexivity.
-Qed. *)
+Compute bin_to_nat (B1 Z).
+Compute bin_to_nat (incr (B1(Z))).
+Compute bin_to_nat (incr (B0 (B1 Z))).
+Compute bin_to_nat (incr (incr (B1(Z)))).
+Compute bin_to_nat (incr (incr (incr (B1(Z))))).
+Compute bin_to_nat (incr (incr (incr (incr (B1(Z)))))).
+
+Example test_bin_incr3 : (incr (B1 (B1 Z))) = B0 (B0 (B1 Z)).
+Proof. simpl. reflexivity. Qed.
 
 Example test_bin_incr4 : bin_to_nat (B0 (B1 Z)) = 2.
 Proof. simpl. reflexivity. Qed.
@@ -1638,6 +1640,8 @@ Proof. simpl. reflexivity. Qed.
 Example test_bin_incr5 :
         bin_to_nat (incr (B1 Z)) = 1 + bin_to_nat (B1 Z).
 Proof. simpl. reflexivity. Qed.
+
+Compute bin_to_nat (incr (incr (B1 Z))).
 
 Example test_bin_incr6 :
         bin_to_nat (incr (incr (B1 Z))) = 2 + bin_to_nat (B1 Z).
