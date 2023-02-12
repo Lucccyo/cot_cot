@@ -274,10 +274,10 @@ Qed.
 Theorem even_S : forall n : nat,
   even (S n) = negb (even n).
 Proof.
-  intros n. induction .
+  intros n. induction n.
     - simpl. reflexivity.
-    - simpl.
-  (* FILL IN HERE *) Admitted.
+    - rewrite -> IHn. simpl. rewrite -> negb_involutive. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (destruct_induction)
@@ -480,9 +480,29 @@ Proof.
 
     Translate your solution for [add_comm] into an informal proof:
 
+Theorem add_comm : forall n m : nat,
+  n + m = m + n.
+Proof.
+  intros n m. induction n.
+    - simpl. rewrite -> add_0_r.  reflexivity.
+    - simpl. rewrite <- plus_n_Sm. rewrite -> IHn. reflexivity.
+Qed.
+
     Theorem: Addition is commutative.
 
-    Proof: (* FILL IN HERE *)
+    Proof: By induction on [n].
+
+    First, suppose [n] = 0. We must show that
+        0 + m = m + 0
+    Because n + 0 = n, this is proved.
+
+    Next, we suppose [n + m = m + n], we need to show that
+        (S n) + m = m + (S n)
+    We know that the addition is comutative so we finaly have
+        (S n) + m = (S n) + m
+
+    :)
+
 *)
 
 (* Do not modify the following line: *)
@@ -497,7 +517,15 @@ Definition manual_grade_for_add_comm_informal : option (nat*string) := None.
 
     Theorem: [(n =? n) = true] for any [n].
 
-    Proof: (* FILL IN HERE *)
+    Proof: By induction on [n]
+
+    First, suppose [n = 0]
+      0 is equal to itself so this first hypothesis is true
+
+    Next, suppose [n = S m]. We need to prove
+        ((S m) =? (S m)) = true
+    As well as in the previous case, [S m] is equal to itself.
+
 *)
 
 (* Do not modify the following line: *)
@@ -515,16 +543,40 @@ Definition manual_grade_for_eqb_refl_informal : option (nat*string) := None.
 Theorem add_shuffle3 : forall n m p : nat,
   n + (m + p) = m + (n + p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m p.
+  rewrite add_assoc'.
+  rewrite add_assoc'.
+  assert (H: n + m = m + n).
+  { rewrite add_comm. reflexivity. }
+  rewrite H. reflexivity.
+  Qed.
 
 (** Now prove commutativity of multiplication.  You will probably want
     to look for (or define and prove) a "helper" theorem to be used in
     the proof of this one. Hint: what is [n * (1 + k)]? *)
 
+Theorem mult_0_r : forall n:nat, n * 0 = 0.
+Proof.
+  induction n.
+  - simpl. reflexivity.
+  - simpl. rewrite IHn. reflexivity. Qed.
+
 Theorem mul_comm : forall m n : nat,
   m * n = n * m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m.
+  destruct m.
+  - simpl. rewrite -> mult_0_r. reflexivity.
+  - induction n.
+    + simpl. rewrite -> mult_0_r. reflexivity.
+    + simpl. rewrite IHn. simpl. rewrite <- mult_n_Sm.
+      assert (H: m + (n + m * n) = n + (m + m * n)).
+      { rewrite add_shuffle3. reflexivity. }
+      rewrite H.
+      assert (H2: m * n + m = m + m * n).
+      { rewrite add_comm. reflexivity. }
+      rewrite H2. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (plus_leb_compat_l)
@@ -538,43 +590,67 @@ Check leb.
 Theorem plus_leb_compat_l : forall n m p : nat,
   n <=? m = true -> (p + n) <=? (p + m) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n p m H.
+  induction m.
+    - simpl. rewrite H. reflexivity.
+    - simpl. rewrite IHm. reflexivity.
+Qed.
 
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, optional (more_exercises)
 
     Take a piece of paper.  For each of the following theorems, first
-    _think_ about whether (a) it can be proved using only
-    simplification and rewriting, (b) it also requires case
-    analysis ([destruct]), or (c) it also requires induction.  Write
-    down your prediction.  Then fill in the proof.  (There is no need
+    _think_ about whether 
+      (a) it can be proved using only simplification and rewriting, 
+      (b) it also requires case analysis ([destruct]), or 
+      (c) it also requires induction.  
+    Write down your prediction.  Then fill in the proof.  (There is no need
     to turn in your piece of paper; this is just to encourage you to
     reflect before you hack!) *)
 
 Theorem leb_refl : forall n:nat,
   (n <=? n) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* induction *)
+  intros n.
+  induction n.
+    - simpl. reflexivity.
+    - simpl. rewrite IHn. reflexivity.
+Qed.
 
 Theorem zero_neqb_S : forall n:nat,
   0 =? (S n) = false.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* simply rewriting *)
+  intros n. simpl. reflexivity.
+Qed.
 
 Theorem andb_false_r : forall b : bool,
   andb b false = false.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* destructing *)
+intros b. destruct b.
+- simpl. reflexivity.
+- simpl. reflexivity.
+Qed.
 
 Theorem S_neqb_0 : forall n:nat,
   (S n) =? 0 = false.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* simply rewriting *)
+  intros n.
+  simpl. reflexivity.
+Qed.
 
 Theorem mult_1_l : forall n:nat, 1 * n = n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* induction  NON *)
+  intros n.
+  destruct n.
+  - simpl. reflexivity.
+  - simpl. rewrite add_0_r. reflexivity.
+Qed.
 
 Theorem all3_spec : forall b c : bool,
   orb
@@ -583,17 +659,35 @@ Theorem all3_spec : forall b c : bool,
          (negb c))
   = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* destructing *)
+  intros b c.
+  destruct b.
+    - destruct c.
+      + simpl. reflexivity.
+      + simpl. reflexivity.
+    - destruct c.
+      + simpl. reflexivity.
+      + simpl. reflexivity.
+Qed.
 
 Theorem mult_plus_distr_r : forall n m p : nat,
   (n + m) * p = (n * p) + (m * p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  (* induction *)
+  intros n m p.
+  induction n.
+  - simpl. reflexivity.
+  - simpl. rewrite IHn. simpl. rewrite add_assoc'. reflexivity.
+Qed.
 
 Theorem mult_assoc : forall n m p : nat,
   n * (m * p) = (n * m) * p.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m p.
+  induction n. 
+  - simpl. reflexivity.
+  - simpl. rewrite IHn. rewrite mult_plus_distr_r. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (add_shuffle3')
