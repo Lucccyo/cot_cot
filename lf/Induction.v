@@ -786,7 +786,7 @@ Qed.
 Fixpoint nat_to_bin (n:nat) : bin :=
   match n with
   | 0 => Z
-  | S n' => nat_to_bin n'
+  | S n' => incr (nat_to_bin n')
   end.
 
 (** Prove that, if we start with any [nat], convert it to [bin], and
@@ -801,7 +801,11 @@ Fixpoint nat_to_bin (n:nat) : bin :=
 
 Theorem nat_bin_nat : forall n, bin_to_nat (nat_to_bin n) = n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  induction n.
+  - simpl. reflexivity.
+  - simpl. rewrite bin_to_nat_pres_incr. simpl. rewrite IHn. reflexivity.
+Qed.
 
 (** [] *)
 
@@ -826,24 +830,40 @@ Abort.
 
 Lemma double_incr : forall n : nat, double (S n) = S (S (double n)).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n.
+  simpl.
+  rewrite double_plus.
+  reflexivity.
+Qed.
 
 (** Now define a similar doubling function for [bin]. *)
 
-Definition double_bin (b:bin) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition double_bin (b:bin) : bin :=
+  match b with
+  | Z => Z
+  | B0 b' => B0 b
+  | B1 b' => B0 b
+  end.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ .". Admitted.*)
 
 (** Check that your function correctly doubles zero. *)
 
 Example double_bin_zero : double_bin Z = Z.
-(* FILL IN HERE *) Admitted.
+Proof.
+  simpl. reflexivity.
+Qed.
 
 (** Prove this lemma, which corresponds to [double_incr]. *)
 
 Lemma double_incr_bin : forall b,
     double_bin (incr b) = incr (incr (double_bin b)).
 Proof.
-  (* FILL IN HERE *) Admitted.
+intros b.
+destruct b.
+- simpl. reflexivity.
+- simpl. reflexivity.
+- simpl. reflexivity.
+Qed.
 
 (** [] *)
 
@@ -884,6 +904,15 @@ Abort.
 Fixpoint normalize (b:bin) : bin
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
+(* Fixpoint normalize (b:bin) : bin 
+:=
+  match b with
+  | Z => Z
+  | B0 b' =>
+  | B1 b' =>
+  end. *)
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *)
+
 (** It would be wise to do some [Example] proofs to check that your definition of
     [normalize] works the way you intend before you proceed. They won't be graded,
     but fill them in below. *)
@@ -903,6 +932,8 @@ Fixpoint normalize (b:bin) : bin
 
 Theorem bin_nat_bin : forall b, nat_to_bin (bin_to_nat b) = normalize b.
 Proof.
+  intros b.
+  
   (* FILL IN HERE *) Admitted.
 
 (** [] *)
