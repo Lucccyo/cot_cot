@@ -841,8 +841,8 @@ Qed.
 Definition double_bin (b:bin) : bin :=
   match b with
   | Z => Z
-  | B0 b' => B0 b
-  | B1 b' => B0 b
+  | B0 _ => B0 b
+  | B1 _ => B0 b
   end.
   (* REPLACE THIS LINE WITH ":= _your_definition_ .". Admitted.*)
 
@@ -901,8 +901,22 @@ Abort.
     end of the [bin] and process each bit only once. Do not try to
     "look ahead" at future bits. *)
 
-Fixpoint normalize (b:bin) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint normalize (b:bin) : bin :=
+match b with
+  | Z => Z
+  | B0 b' => double_bin (normalize b')
+  | B1 b' => B1 (normalize b')
+end.
+
+Example norm :(normalize (B0 (B0 Z))) = Z.
+Proof.
+  simpl. reflexivity.
+Qed.
+Example norm1 :(normalize (B1 (B0 Z))) = B1 Z.
+Proof.
+  simpl. reflexivity.
+Qed.
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." . Admitted.*)
 
 (* Fixpoint normalize (b:bin) : bin 
 :=
@@ -930,11 +944,24 @@ Fixpoint normalize (b:bin) : bin
     Hint 2: Lemma [double_incr_bin] that you proved above will be
     helpful, too.*)
 
+Lemma double_check : forall n, nat_to_bin (n + n) = double_bin (nat_to_bin n).
+Proof.
+  intros n.
+  induction n.
+  - simpl. reflexivity.
+  - simpl. rewrite <- plus_n_Sm. simpl. rewrite -> IHn.
+    rewrite <- double_incr_bin. reflexivity.
+Qed.
+
 Theorem bin_nat_bin : forall b, nat_to_bin (bin_to_nat b) = normalize b.
 Proof.
   intros b.
-  
-  (* FILL IN HERE *) Admitted.
+  induction b.
+  - simpl. reflexivity.
+  - simpl. rewrite -> double_check. rewrite -> IHb. reflexivity.
+  - simpl. rewrite -> double_check. rewrite -> IHb. clear IHb.
+    destruct (normalize b) ; simpl ; reflexivity.
+Qed.
 
 (** [] *)
 
